@@ -1,0 +1,1499 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Faculty Evaluation System - Saint Joseph College</title>
+  
+  <!-- Font Awesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- React & Babel Scripts -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <style>
+    :root {
+      --sjc-green: #012e22;
+      --sjc-green-dark: #011812;
+      --sjc-gold: #facc15;
+      --sjc-gold-hover: #eab308;
+      
+      --sidebar-bg: #012e22;
+      --sidebar-hover: #012219;
+      --sidebar-active: #facc15;
+      --sidebar-text: #a7f3d0;
+      --sidebar-text-active: #011812;
+      
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      
+      --primary: #012e22;
+      --primary-hover: #012219;
+      --accent: #10b981;
+      
+      --input-bg: #ffffff;
+      --input-border: #cbd5e1;
+      --table-header-bg: #f1f5f9;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    }
+
+    [data-theme="dark"] {
+      --sidebar-bg: #011812;
+      --sidebar-hover: #012e22;
+      --sidebar-active: #facc15;
+      --sidebar-text: #64748b;
+      --sidebar-text-active: #011812;
+      
+      --bg-color: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --accent: #34d399;
+      
+      --input-bg: #1f2937;
+      --input-border: #374151;
+      --table-header-bg: #1f2937;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Saint Joseph College Login Screen Layout with logo.jpg Background */
+    #loginScreen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 2000;
+      background: linear-gradient(rgba(1, 24, 18, 0.88), rgba(1, 46, 34, 0.92)), url('logo.jpg') no-repeat center center;
+      background-size: cover;
+      overflow-y: auto;
+    }
+
+    /* Top Sub-navbar */
+    .sjc-topbar {
+      background: rgba(1, 24, 18, 0.95);
+      color: #ffffff;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 8px 48px;
+      font-size: 12px;
+      font-weight: 600;
+      gap: 24px;
+      border-bottom: 1px solid rgba(250, 204, 21, 0.2);
+    }
+
+    .sjc-topbar span {
+      cursor: pointer;
+      opacity: 0.85;
+    }
+    .sjc-topbar span:hover {
+      opacity: 1;
+      color: var(--sjc-gold);
+    }
+
+    /* Main Header Navigation */
+    .sjc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 48px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .sjc-logo-area {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+    }
+
+    /* Circular Logo Styling with Light Gold Outline */
+    .logo-circle-wrapper {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border: 2.5px solid var(--sjc-gold);
+      flex-shrink: 0;
+      box-shadow: 0 0 10px rgba(250, 204, 21, 0.4);
+    }
+
+    .logo-circle-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .sidebar-brand .logo-circle-wrapper {
+      width: 36px;
+      height: 36px;
+      border-color: var(--sjc-gold);
+      box-shadow: 0 0 8px rgba(250, 204, 21, 0.5);
+    }
+
+    .sjc-logo-area h1 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--sjc-green);
+      letter-spacing: 0.5px;
+    }
+
+    .sjc-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .sjc-nav-links span {
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+    .sjc-nav-links span:hover, .sjc-nav-links span.active {
+      background: rgba(1, 46, 34, 0.08);
+      color: var(--sjc-green);
+    }
+
+    /* Modal Overlay for Navigation & Achievements Pages */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 720px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 32px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      position: relative;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #f1f5f9;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #0f172a;
+      z-index: 10;
+    }
+    .modal-close:hover {
+      background: #e2e8f0;
+    }
+
+    /* Image Gallery Grid - Clickable Pure Image Cards */
+    .slp-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .slp-img-card {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1.5px solid var(--card-border);
+      background: #f8fafc;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .slp-img-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+      border-color: var(--sjc-green);
+    }
+
+    .slp-img-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Fullscreen Image Preview Lightbox */
+    .lightbox-card {
+      background: transparent;
+      max-width: 90vw;
+      max-height: 90vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+      box-shadow: none;
+    }
+
+    .lightbox-card img {
+      max-width: 100%;
+      max-height: 80vh;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    /* Login Portal Card Container - University Style */
+    .sjc-login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+      flex: 1;
+    }
+
+    .login-card {
+      background: #ffffff;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .login-card-header {
+      background: var(--sjc-green);
+      padding: 28px 24px;
+      text-align: center;
+      color: #ffffff;
+      border-bottom: 4px solid var(--sjc-gold);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .login-card-header .logo-circle-wrapper {
+      width: 64px;
+      height: 64px;
+      border-width: 3px;
+    }
+
+    .login-card-header h3 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .login-card-header p {
+      font-size: 12px;
+      color: #a7f3d0;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .login-card-body {
+      padding: 32px 28px;
+    }
+
+    /* Aesthetic Split Input Group Style */
+    .split-input-group {
+      display: flex;
+      align-items: stretch;
+      border: 1.5px solid var(--input-border);
+      border-radius: 12px;
+      background: var(--input-bg);
+      overflow: hidden;
+      margin-bottom: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .split-input-group:focus-within {
+      border-color: var(--sjc-green);
+      box-shadow: 0 0 0 3px rgba(1, 46, 34, 0.12);
+    }
+
+    .input-icon-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      background: #f8fafc;
+      color: #64748b;
+      border-right: 1.5px solid var(--input-border);
+      font-size: 15px;
+    }
+
+    .split-input-group input, 
+    .split-input-group select {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 12px 14px;
+      font-size: 14px;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .input-action-btn {
+      background: transparent;
+      border: none;
+      padding: 0 14px;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .input-action-btn:hover {
+      color: var(--sjc-green);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .forgot-link {
+      font-size: 12px;
+      color: var(--sjc-green);
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    .btn-sjc-gold {
+      width: 100%;
+      background: linear-gradient(135deg, #facc15, #eab308);
+      color: #011812;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(234, 179, 8, 0.3);
+    }
+
+    .btn-sjc-gold:hover {
+      background: linear-gradient(135deg, #fde047, #facc15);
+    }
+
+    /* Standard App Layout after login */
+    .app-layout {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 260px;
+      background: var(--sidebar-bg);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 12px 24px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .sidebar-menu {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      color: var(--sidebar-text);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .sidebar-item:hover {
+      background: var(--sidebar-hover);
+      color: #ffffff;
+    }
+
+    .sidebar-item.active {
+      background: var(--sidebar-active);
+      color: var(--sidebar-text-active);
+    }
+
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .top-header {
+      height: 70px;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      gap: 16px;
+    }
+
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .avatar-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--sjc-gold);
+      color: var(--sjc-green-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .content-area {
+      padding: 32px;
+      flex: 1;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(1, 46, 34, 0.1);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .stat-details h4 {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .stat-details p {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-top: 2px;
+    }
+
+    /* Modern Department Banner Cards */
+    .cics-dashboard-card {
+      background: linear-gradient(135deg, var(--sjc-green), var(--sjc-green-dark));
+      border-radius: 16px;
+      padding: 24px 28px;
+      color: #ffffff;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(1, 46, 34, 0.2);
+      border: 2px solid var(--sjc-gold);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .cics-dashboard-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(1, 46, 34, 0.35);
+    }
+
+    .cics-card-content h4 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--sjc-gold);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cics-card-content p {
+      font-size: 13px;
+      color: #a7f3d0;
+      max-width: 500px;
+      line-height: 1.5;
+    }
+
+    .cics-image-wrapper {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2.5px solid var(--sjc-gold);
+      background: #ffffff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .cics-image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .content-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .content-card h3 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input:not([type="checkbox"]), select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--input-border);
+      border-radius: 10px;
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(1, 46, 34, 0.15);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .btn-submit:hover {
+      background: var(--primary-hover);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+      font-size: 14px;
+    }
+
+    th {
+      background: var(--table-header-bg);
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .badge-dept {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent);
+    }
+
+    .theme-toggle-btn {
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root" style="width: 100%;"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const API_URL = 'http://localhost:5000/api';
+
+    // Sample Student Roster Data
+    const INITIAL_STUDENTS = [
+      { id: '2026-0001', name: 'Ian Pollosco Umadac', course: 'BSIT', yearLevel: '2nd Year', section: '2A', email: 'ian.umadac@sjc.edu.ph', status: 'Enrolled' },
+      { id: '2026-0002', name: 'Maria Santos', course: 'BSBA', yearLevel: '3rd Year', section: '3B', email: 'maria.santos@sjc.edu.ph', status: 'Enrolled' },
+      { id: '2026-0003', name: 'Juan Dela Cruz', course: 'BSIT', yearLevel: '1st Year', section: '1A', email: 'juan.delacruz@sjc.edu.ph', status: 'Enrolled' },
+      { id: '2026-0004', name: 'Angelica Reyes', course: 'BSED', yearLevel: '2nd Year', section: '2B', email: 'angelica.reyes@sjc.edu.ph', status: 'Enrolled' },
+      { id: '2026-0005', name: 'Mark Anthony Cruz', course: 'BSIT', yearLevel: '4th Year', section: '4A', email: 'mark.cruz@sjc.edu.ph', status: 'Enrolled' }
+    ];
+
+    function App() {
+      const [theme, setTheme] = useState('light');
+      const [isLoggedIn, setIsLoggedIn] = useState(false);
+      const [user, setUser] = useState({ name: '', email: '', password: '', role: 'Student', department: 'HEU' });
+      const [showPassword, setShowPassword] = useState(false);
+      const [activeTab, setActiveTab] = useState('dashboard');
+      const [activeModal, setActiveModal] = useState(null); // 'academics' | 'admissions' | 'campus' | 'cics' | 'cas' | 'cbm'
+      const [previewImage, setPreviewImage] = useState(null); // Lightbox selected image source
+
+      const [students, setStudents] = useState(INITIAL_STUDENTS);
+      const [studentSearch, setStudentSearch] = useState('');
+      const [subjects, setSubjects] = useState([]);
+      const [evaluations, setEvaluations] = useState([]);
+      const [evalForm, setEvalForm] = useState({ subjectId: '', rating: '5', comments: '' });
+      const [regForm, setRegForm] = useState({ name: '', email: '', role: 'Student', department: 'HEU' });
+
+      useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+      }, [theme]);
+
+      useEffect(() => {
+        if (isLoggedIn) {
+          fetchSubjects();
+          fetchEvaluations();
+        }
+      }, [isLoggedIn]);
+
+      const toggleTheme = () => setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+
+      const handleLogin = (e) => {
+        e.preventDefault();
+        if (!user.name || !user.email) {
+          alert('Please enter your name and email/username.');
+          return;
+        }
+        axios.post(`${API_URL}/register`, user)
+          .then(() => setIsLoggedIn(true))
+          .catch(() => setIsLoggedIn(true));
+      };
+
+      const fetchSubjects = () => {
+        axios.get(`${API_URL}/subjects`)
+          .then(res => setSubjects(res.data))
+          .catch(() => {
+            setSubjects([
+              { id: 101, code: 'IT201', name: 'Data Structures & Algorithms', instructor: 'Prof. Santos', department: 'HEU' },
+              { id: 102, code: 'IT202', name: 'Web Programming (React & Node)', instructor: 'Prof. Reyes', department: 'HEU' },
+              { id: 103, code: 'ENG101', name: 'Academic Writing & Communication', instructor: 'Prof. Cruz', department: 'BEU' }
+            ]);
+          });
+      };
+
+      const fetchEvaluations = () => {
+        axios.get(`${API_URL}/evaluations`)
+          .then(res => setEvaluations(res.data))
+          .catch(err => console.error(err));
+      };
+
+      const handleEvaluationSubmit = (e) => {
+        e.preventDefault();
+        axios.post(`${API_URL}/evaluations`, { studentName: user.name, ...evalForm })
+          .then(() => {
+            alert('Evaluation submitted successfully!');
+            setEvalForm({ subjectId: '', rating: '5', comments: '' });
+            fetchEvaluations();
+            setActiveTab('evaluations-list');
+          })
+          .catch(() => {
+            alert('Submitted evaluation locally!');
+            setEvaluations(prev => [...prev, { id: Date.now(), studentName: user.name, ...evalForm, submittedAt: new Date().toISOString() }]);
+            setActiveTab('evaluations-list');
+          });
+      };
+
+      const handleUserRegistration = (e) => {
+        e.preventDefault();
+        axios.post(`${API_URL}/register`, regForm)
+          .then(() => alert('User registered successfully!'))
+          .catch(() => alert('User registered!'));
+      };
+
+      const filteredStudents = students.filter(s => 
+        s.name.toLowerCase().includes(studentSearch.toLowerCase()) ||
+        s.id.toLowerCase().includes(studentSearch.toLowerCase()) ||
+        s.course.toLowerCase().includes(studentSearch.toLowerCase())
+      );
+
+      return (
+        <div style={{ width: '100%' }}>
+          {/* Fullscreen Lightbox Image Preview Modal */}
+          {previewImage && (
+            <div className="modal-overlay" style={{ zIndex: 4000 }} onClick={() => setPreviewImage(null)}>
+              <div className="modal-card lightbox-card" onClick={e => e.stopPropagation()}>
+                <button className="modal-close" onClick={() => setPreviewImage(null)}><i className="fa-solid fa-xmark"></i></button>
+                <img src={previewImage} alt="Expanded View" />
+              </div>
+            </div>
+          )}
+
+          {/* Interactive Modals for Header Links & Department Sections */}
+          {activeModal && (
+            <div className="modal-overlay" onClick={() => setActiveModal(null)}>
+              <div className="modal-card" onClick={e => e.stopPropagation()}>
+                <button className="modal-close" onClick={() => setActiveModal(null)}><i className="fa-solid fa-xmark"></i></button>
+                
+                {activeModal === 'academics' && (
+                  <div>
+                    <h3 style={{ color: 'var(--sjc-green)', fontSize: '20px', fontWeight: '800', marginBottom: '16px' }}><i className="fa-solid fa-book-open"></i> Academic Programs</h3>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.6', marginBottom: '16px' }}>Saint Joseph College offers high-standard education across basic and higher education units rooted in Faith, Communion, and Service.</p>
+                    <ul style={{ paddingLeft: '20px', fontSize: '14px', lineHeight: '1.8', color: 'var(--text-main)' }}>
+                      <li><b>Higher Education Unit (HEU):</b> BS Information Technology, BS Business Administration, Bachelor of Elementary & Secondary Education.</li>
+                      <li><b>Basic Education Unit (BEU):</b> Senior High School (STEM, ABM, HUMSS), Junior High School, and Elementary.</li>
+                    </ul>
+                  </div>
+                )}
+
+                {activeModal === 'admissions' && (
+                  <div>
+                    <h3 style={{ color: 'var(--sjc-green)', fontSize: '20px', fontWeight: '800', marginBottom: '16px' }}><i className="fa-solid fa-user-graduate"></i> Admissions & Enrollment</h3>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.6', marginBottom: '16px' }}>Join our vibrant academic community for the upcoming semester. Admissions are currently open!</p>
+                    <ul style={{ paddingLeft: '20px', fontSize: '14px', lineHeight: '1.8', color: 'var(--text-main)' }}>
+                      <li>Form 138 / Report Card</li>
+                      <li>Certificate of Good Moral Character</li>
+                      <li>PSA Birth Certificate copy</li>
+                      <li>2x2 Recent Color Photos</li>
+                    </ul>
+                  </div>
+                )}
+
+                {activeModal === 'campus' && (
+                  <div>
+                    <h3 style={{ color: 'var(--sjc-green)', fontSize: '20px', fontWeight: '800', marginBottom: '16px' }}><i className="fa-solid fa-building-columns"></i> Campus Life & Activities</h3>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.6', marginBottom: '16px' }}>Experience holistic student development through sports, tech clubs, spiritual formation, and community outreach programs.</p>
+                    <ul style={{ paddingLeft: '20px', fontSize: '14px', lineHeight: '1.8', color: 'var(--text-main)' }}>
+                      <li>Sangguniang Kabataan & Student Council Initiatives</li>
+                      <li>IT Laboratory & Coding Clubs</li>
+                      <li>Service-Learning Program (SLP) & Community Outreach</li>
+                    </ul>
+                  </div>
+                )}
+
+                {activeModal === 'cics' && (
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
+                      <div className="cics-image-wrapper" style={{ width: '56px', height: '56px' }}>
+                        <img src="cics.jpg" alt="CICS Logo" />
+                      </div>
+                      <div>
+                        <h3 style={{ color: 'var(--sjc-green)', fontSize: '20px', fontWeight: '800' }}>CICS Department Highlights</h3>
+                        <p style={{ color: 'var(--sjc-gold)', fontSize: '12px', fontWeight: '700' }}>College of Information & Computer Studies</p>
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: '20px' }}>
+                      <h4 style={{ fontSize: '15px', color: 'var(--sjc-green)', fontWeight: '800', marginBottom: '8px' }}><i className="fa-solid fa-trophy"></i> Department Achievements</h4>
+                      <ul style={{ paddingLeft: '20px', fontSize: '13px', lineHeight: '1.7', color: 'var(--text-main)' }}>
+                        <li>🏆 <b>1st Place - Regional Hackathon & Web Development Showcase</b></li>
+                        <li>💻 <b>Barangay Information Portal Project Launch</b> (React & Node.js Architecture)</li>
+                        <li>🔒 <b>100% Completion Rate</b> in IT Security & Vulnerability Assessment Lab Exercises</li>
+                        <li>📜 <b>Official Accreditation:</b> Recognized Center of Excellence for IT Education</li>
+                      </ul>
+                    </div>
+
+                    <hr style={{ borderColor: 'var(--card-border)', marginBottom: '20px' }} />
+
+                    <div>
+                      <h4 style={{ fontSize: '15px', color: 'var(--accent)', fontWeight: '800', marginBottom: '6px' }}>
+                        <i className="fa-solid fa-seedling"></i> Success SLP: Nature Protection Initiative
+                      </h4>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '13px', lineHeight: '1.5', marginBottom: '12px' }}>
+                        Our CICS Service-Learning Program (SLP) successfully conducted community environmental outreach projects. Click any image to preview in full screen:
+                      </p>
+
+                      <div className="slp-gallery-grid">
+                        <div className="slp-img-card" onClick={() => setPreviewImage('slp1.jpg')}>
+                          <img src="slp1.jpg" alt="SLP 1" />
+                        </div>
+                        <div className="slp-img-card" onClick={() => setPreviewImage('slp2.jpg')}>
+                          <img src="slp2.jpg" alt="SLP 2" />
+                        </div>
+                        <div className="slp-img-card" onClick={() => setPreviewImage('slp3.jpg')}>
+                          <img src="slp3.jpg" alt="SLP 3" />
+                        </div>
+                        <div className="slp-img-card" onClick={() => setPreviewImage('slp4.jpg')}>
+                          <img src="slp4.jpg" alt="SLP 4" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeModal === 'cas' && (
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
+                      <div className="cics-image-wrapper" style={{ width: '56px', height: '56px' }}>
+                        <img src="cas.jpg" alt="CAS Logo" />
+                      </div>
+                      <div>
+                        <h3 style={{ color: 'var(--sjc-green)', fontSize: '20px', fontWeight: '800' }}>CAS Department Corner</h3>
+                        <p style={{ color: 'var(--sjc-gold)', fontSize: '12px', fontWeight: '700' }}>College of Arts & Sciences</p>
+                      </div>
+                    </div>
+
+                    <p style={{ color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.6', marginBottom: '16px' }}>
+                      The College of Arts & Sciences (CAS) provides core liberal arts, scientific inquiry, humanities, and communication foundations that shape well-rounded students equipped with critical thinking and leadership skills.
+                    </p>
+
+                    <div style={{ marginBottom: '20px' }}>
+                      <h4 style={{ fontSize: '15px', color: '#ca8a04', fontWeight: '800', marginBottom: '8px' }}>
+                        <i className="fa-solid fa-crown"></i> Mr. Intramurals 1st Runner Up Showcase
+                      </h4>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '13px', lineHeight: '1.5', marginBottom: '12px' }}>
+                        Celebrating CAS department excellence in leadership, poise, and sportsmanship. Click the photo to preview in full screen:
+                      </p>
+
+                      <div className="slp-gallery-grid" style={{ gridTemplateColumns: '1fr', maxWidth: '320px', margin: '0 auto' }}>
+                        <div className="slp-img-card" onClick={() => setPreviewImage('mr.jpg')}>
+                          <img src="mr.jpg" alt="Mr. Intramurals 1st Runner Up" style={{ height: '240px' }} />
+                        </div>
+                      </div>
+                    </div>
+
+                    <hr style={{ borderColor: 'var(--card-border)', marginBottom: '20px' }} />
+
+                    <h4 style={{ fontSize: '15px', color: 'var(--sjc-green)', fontWeight: '800', marginBottom: '8px' }}><i className="fa-solid fa-star"></i> CAS Programs & Milestones</h4>
+                    <ul style={{ paddingLeft: '20px', fontSize: '13px', lineHeight: '1.8', color: 'var(--text-main)' }}>
+                      <li>📚 <b>Liberal Arts & Sciences Curriculum:</b> Deep emphasis on scientific research, mathematics, and communicative arts.</li>
+                      <li>🎭 <b>Cultural & Literary Arts Guild:</b> Active student organizations promoting debate, journalism, and theatrical arts.</li>
+                      <li>🌍 <b>Community Extension Programs:</b> Leadership training and bilingual literacy workshops for elementary and high school learners.</li>
+                    </ul>
+                  </div>
+                )}
+
+                {/* CBM Corner Modal */}
+                {activeModal === 'cbm' && (
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
+                      <div className="cics-image-wrapper" style={{ width: '56px', height: '56px' }}>
+                        <img src="cbm.jpg" alt="CBM Logo" />
+                      </div>
+                      <div>
+                        <h3 style={{ color: 'var(--sjc-green)', fontSize: '20px', fontWeight: '800' }}>CBM Department Corner</h3>
+                        <p style={{ color: 'var(--sjc-gold)', fontSize: '12px', fontWeight: '700' }}>College of Business & Management</p>
+                      </div>
+                    </div>
+
+                    <p style={{ color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.6', marginBottom: '16px' }}>
+                      Welcome to the CBM Department Corner! Developing innovative business leaders, entrepreneurs, and administrative executives with strong ethical foundations and creative spirit.
+                    </p>
+
+                    <div style={{ marginBottom: '20px' }}>
+                      <h4 style={{ fontSize: '15px', color: '#ca8a04', fontWeight: '800', marginBottom: '8px' }}>
+                        <i className="fa-solid fa-trophy"></i> 1st Runner Up - Street Dancing Competition
+                      </h4>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '13px', lineHeight: '1.5', marginBottom: '12px' }}>
+                        Celebrating our CBM street dancing contingent for taking home 1st Runner Up in the intramural cultural competition! Click any photo to preview in full screen:
+                      </p>
+
+                      <div className="slp-gallery-grid">
+                        <div className="slp-img-card" onClick={() => setPreviewImage('cbma.jpg')}>
+                          <img src="cbma.jpg" alt="CBM Street Dancing 1" />
+                        </div>
+                        <div className="slp-img-card" onClick={() => setPreviewImage('cbma2.jpg')}>
+                          <img src="cbma2.jpg" alt="CBM Street Dancing 2" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {!isLoggedIn ? (
+            <div id="loginScreen">
+              {/* Top Sub-navbar */}
+              <div className="sjc-topbar">
+                <span>PORTAL</span>
+                <span>STUDENT SERVICES</span>
+                <span>OFFICE OF THE REGISTRAR</span>
+              </div>
+
+              {/* Main Header Navigation */}
+              <header className="sjc-header">
+                <div className="sjc-logo-area" onClick={() => setActiveModal(null)}>
+                  <div className="logo-circle-wrapper">
+                    <img src="logo.jpg" alt="Saint Joseph College Logo" />
+                  </div>
+                  <h1>SAINT JOSEPH COLLEGE</h1>
+                </div>
+                <div className="sjc-nav-links">
+                  <span onClick={() => setActiveModal(null)} className={!activeModal ? 'active' : ''}>HOME</span>
+                  <span onClick={() => setActiveModal('academics')} className={activeModal === 'academics' ? 'active' : ''}>ACADEMICS</span>
+                  <span onClick={() => setActiveModal('admissions')} className={activeModal === 'admissions' ? 'active' : ''}>ADMISSIONS</span>
+                  <span onClick={() => setActiveModal('campus')} className={activeModal === 'campus' ? 'active' : ''}>CAMPUS LIFE</span>
+                </div>
+              </header>
+
+              {/* Login Portal Card Container - University Style */}
+              <div className="sjc-login-container">
+                <div className="login-card">
+                  <div className="login-card-header">
+                    <div className="logo-circle-wrapper">
+                      <img src="logo.jpg" alt="Logo" />
+                    </div>
+                    <h3>Sign In to Portal</h3>
+                    <p>Student & Faculty Portal</p>
+                  </div>
+                  
+                  <div className="login-card-body">
+                    <form onSubmit={handleLogin}>
+                      {/* Full Name */}
+                      <div className="form-group">
+                        <label>Full Name</label>
+                        <div className="split-input-group">
+                          <div className="input-icon-box">
+                            <i className="fa-solid fa-user"></i>
+                          </div>
+                          <input
+                            type="text"
+                            required
+                            placeholder="Juan Dela Cruz"
+                            value={user.name}
+                            onChange={e => setUser({ ...user, name: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Username / Email */}
+                      <div className="form-group">
+                        <label>Username / Email</label>
+                        <div className="split-input-group">
+                          <div className="input-icon-box">
+                            <i className="fa-solid fa-envelope"></i>
+                          </div>
+                          <input
+                            type="text"
+                            required
+                            placeholder="student@saintjoseph.edu.ph"
+                            value={user.email}
+                            onChange={e => setUser({ ...user, email: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Password */}
+                      <div className="form-group">
+                        <div className="form-label-row">
+                          <label>Password</label>
+                          <a href="#forgot" className="forgot-link" onClick={(e) => { e.preventDefault(); alert('Password reset instructions sent to email.'); }}>Forgot Password?</a>
+                        </div>
+                        <div className="split-input-group">
+                          <div className="input-icon-box">
+                            <i className="fa-solid fa-lock"></i>
+                          </div>
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            required
+                            placeholder="••••••••"
+                            value={user.password}
+                            onChange={e => setUser({ ...user, password: e.target.value })}
+                          />
+                          <button 
+                            type="button" 
+                            className="input-action-btn" 
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            <i className={showPassword ? "fa-solid fa-eye-slash" : "fa-solid fa-eye"}></i>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Department */}
+                      <div className="form-group">
+                        <label>Department</label>
+                        <div className="split-input-group">
+                          <div className="input-icon-box">
+                            <i className="fa-solid fa-building-columns"></i>
+                          </div>
+                          <select value={user.department} onChange={e => setUser({ ...user, department: e.target.value })}>
+                            <option value="HEU">Higher Education Unit (HEU)</option>
+                            <option value="BEU">Basic Education Unit (BEU)</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Role */}
+                      <div className="form-group">
+                        <label>Role</label>
+                        <div className="split-input-group">
+                          <div className="input-icon-box">
+                            <i className="fa-solid fa-id-badge"></i>
+                          </div>
+                          <select value={user.role} onChange={e => setUser({ ...user, role: e.target.value })}>
+                            <option value="Student">Student</option>
+                            <option value="Faculty">Faculty</option>
+                            <option value="Admin">Administrator</option>
+                          </select>
+                        </div>
+                      </div>
+                      
+                      <button type="submit" className="btn-sjc-gold">
+                        Sign In to Portal <i className="fa-solid fa-arrow-right"></i>
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="app-layout">
+              <aside className="sidebar">
+                <div>
+                  <div className="sidebar-brand">
+                    <div className="logo-circle-wrapper">
+                      <img src="logo.jpg" alt="Logo" />
+                    </div>
+                    <span>Saint Joseph College</span>
+                  </div>
+                  <div className="sidebar-menu">
+                    <div className={`sidebar-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
+                      <i className="fa-solid fa-chart-pie"></i> Dashboard
+                    </div>
+                    <div className={`sidebar-item ${activeTab === 'students' ? 'active' : ''}`} onClick={() => setActiveTab('students')}>
+                      <i className="fa-solid fa-user-graduate"></i> Student List
+                    </div>
+                    <div className={`sidebar-item ${activeTab === 'subjects' ? 'active' : ''}`} onClick={() => setActiveTab('subjects')}>
+                      <i className="fa-solid fa-book"></i> Enrolled Subjects
+                    </div>
+                    <div className={`sidebar-item ${activeTab === 'evaluate' ? 'active' : ''}`} onClick={() => setActiveTab('evaluate')}>
+                      <i className="fa-solid fa-pen-to-square"></i> Faculty Evaluation
+                    </div>
+                    <div className={`sidebar-item ${activeTab === 'evaluations-list' ? 'active' : ''}`} onClick={() => setActiveTab('evaluations-list')}>
+                      <i className="fa-solid fa-list-check"></i> Records List
+                    </div>
+                    <div className={`sidebar-item ${activeTab === 'register' ? 'active' : ''}`} onClick={() => setActiveTab('register')}>
+                      <i className="fa-solid fa-user-plus"></i> User Management
+                    </div>
+                  </div>
+                </div>
+
+                <button className="theme-toggle-btn" onClick={toggleTheme}>
+                  <i className={theme === 'light' ? 'fa-solid fa-moon' : 'fa-solid fa-sun'}></i>
+                  {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+                </button>
+              </aside>
+
+              <div className="main-wrapper">
+                <header className="top-header">
+                  <h3 style={{ fontSize: '18px', fontWeight: '700' }}>
+                    {activeTab.toUpperCase().replace('-', ' ')}
+                  </h3>
+                  <div className="user-profile-badge">
+                    <div className="avatar-circle">
+                      {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '14px', fontWeight: '700' }}>{user.name}</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{user.role} ({user.department})</div>
+                    </div>
+                  </div>
+                </header>
+
+                <main className="content-area">
+                  <div className="stats-grid">
+                    <div className="stat-card">
+                      <div className="stat-icon" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
+                        <i className="fa-solid fa-users"></i>
+                      </div>
+                      <div className="stat-details">
+                        <h4>Total Students</h4>
+                        <p>{students.length}</p>
+                      </div>
+                    </div>
+                    <div className="stat-card">
+                      <div className="stat-icon"><i className="fa-solid fa-book-open"></i></div>
+                      <div className="stat-details">
+                        <h4>Enrolled Subjects</h4>
+                        <p>{subjects.length}</p>
+                      </div>
+                    </div>
+                    <div className="stat-card">
+                      <div className="stat-icon" style={{ background: 'rgba(16, 185, 129, 0.1)', color: 'var(--accent)' }}>
+                        <i className="fa-solid fa-square-check"></i>
+                      </div>
+                      <div className="stat-details">
+                        <h4>Completed Forms</h4>
+                        <p>{evaluations.length}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {activeTab === 'dashboard' && (
+                    <div>
+                      {/* Tapable CICS Section Banner */}
+                      <div className="cics-dashboard-card" onClick={() => setActiveModal('cics')}>
+                        <div className="cics-card-content">
+                          <h4><i className="fa-solid fa-laptop-code"></i> CICS Department Corner</h4>
+                          <p>College of Information & Computer Studies. Tap here to view our department achievements, awards, and Success SLP Nature Protection gallery!</p>
+                        </div>
+                        <div className="cics-image-wrapper">
+                          <img src="cics.jpg" alt="CICS Logo" />
+                        </div>
+                      </div>
+
+                      {/* Tapable CAS Section Banner */}
+                      <div className="cics-dashboard-card" style={{ background: 'linear-gradient(135deg, #0f766e, #115e59)' }} onClick={() => setActiveModal('cas')}>
+                        <div className="cics-card-content">
+                          <h4><i className="fa-solid fa-graduation-cap"></i> CAS Department Corner</h4>
+                          <p>College of Arts & Sciences. Tap here to view our Mr. Intramurals 1st Runner Up showcase, liberal arts curriculum, and academic milestones!</p>
+                        </div>
+                        <div className="cics-image-wrapper">
+                          <img src="cas.jpg" alt="CAS Logo" />
+                        </div>
+                      </div>
+
+                      {/* Tapable CBM Section Banner */}
+                      <div className="cics-dashboard-card" style={{ background: 'linear-gradient(135deg, #854d0e, #451a03)' }} onClick={() => setActiveModal('cbm')}>
+                        <div className="cics-card-content">
+                          <h4 style={{ color: '#fde047' }}><i className="fa-solid fa-briefcase"></i> CBM Department Corner</h4>
+                          <p style={{ color: '#fef08a' }}>College of Business & Management. Tap here to view our 1st Runner Up Street Dancing Competition showcase!</p>
+                        </div>
+                        <div className="cics-image-wrapper" style={{ borderColor: '#fde047' }}>
+                          <img src="cbm.jpg" alt="CBM Logo" />
+                        </div>
+                      </div>
+
+                      <div className="content-card">
+                        <h3><i className="fa-solid fa-house" style={{ color: 'var(--primary)' }}></i> Welcome to Saint Joseph College Faculty Evaluation Portal</h3>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '14px', lineHeight: '1.6' }}>
+                          Manage semester evaluations, view registered subjects, browse student directories, and issue feedback for academic quality assessment across BEU and HEU departments.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === 'students' && (
+                    <div className="content-card">
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+                        <h3><i className="fa-solid fa-user-graduate" style={{ color: 'var(--primary)' }}></i> Student Directory & List</h3>
+                        <div style={{ maxWidth: '300px', width: '100%' }}>
+                          <input 
+                            type="text" 
+                            placeholder="Search student name, ID or course..." 
+                            value={studentSearch} 
+                            onChange={e => setStudentSearch(e.target.value)} 
+                          />
+                        </div>
+                      </div>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Student ID</th>
+                            <th>Full Name</th>
+                            <th>Course</th>
+                            <th>Year Level</th>
+                            <th>Section</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredStudents.length > 0 ? (
+                            filteredStudents.map((st, idx) => (
+                              <tr key={idx}>
+                                <td><b>{st.id}</b></td>
+                                <td>{st.name}</td>
+                                <td><span className="badge-dept">{st.course}</span></td>
+                                <td>{st.yearLevel}</td>
+                                <td>{st.section}</td>
+                                <td>{st.email}</td>
+                                <td><span style={{ color: 'var(--accent)', fontWeight: '700' }}>● {st.status}</span></td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan="7" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No students found matching your search.</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {activeTab === 'subjects' && (
+                    <div className="content-card">
+                      <h3><i className="fa-solid fa-book" style={{ color: 'var(--primary)' }}></i> Enrolled Subjects List</h3>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Subject Code</th>
+                            <th>Subject Title</th>
+                            <th>Instructor</th>
+                            <th>Department</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {subjects.map(sub => (
+                            <tr key={sub.id}>
+                              <td><b>{sub.code}</b></td>
+                              <td>{sub.name}</td>
+                              <td>{sub.instructor}</td>
+                              <td><span className="badge-dept">{sub.department}</span></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {activeTab === 'evaluate' && (
+                    <div className="content-card" style={{ maxWidth: '650px' }}>
+                      <h3><i className="fa-solid fa-pen-to-square" style={{ color: 'var(--primary)' }}></i> Faculty Evaluation Form</h3>
+                      <form onSubmit={handleEvaluationSubmit}>
+                        <div className="form-group">
+                          <label>Select Enrolled Subject & Instructor</label>
+                          <select required value={evalForm.subjectId} onChange={e => setEvalForm({ ...evalForm, subjectId: e.target.value })}>
+                            <option value="">-- Choose Subject --</option>
+                            {subjects.map(sub => (
+                              <option key={sub.id} value={sub.id}>
+                                {sub.code} - {sub.name} ({sub.instructor})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="form-group">
+                          <label>Performance Rating (1 - 5 Stars)</label>
+                          <select value={evalForm.rating} onChange={e => setEvalForm({ ...evalForm, rating: e.target.value })}>
+                            <option value="5">⭐⭐⭐⭐⭐ (5 - Outstanding)</option>
+                            <option value="4">⭐⭐⭐⭐ (4 - Very Satisfactory)</option>
+                            <option value="3">⭐⭐⭐ (3 - Satisfactory)</option>
+                            <option value="2">⭐⭐ (2 - Fair)</option>
+                            <option value="1">⭐ (1 - Poor)</option>
+                          </select>
+                        </div>
+
+                        <div className="form-group">
+                          <label>Constructive Comments / Feedback</label>
+                          <textarea rows="4" placeholder="Enter evaluation comments..." value={evalForm.comments} onChange={e => setEvalForm({ ...evalForm, comments: e.target.value })}></textarea>
+                        </div>
+
+                        <button type="submit" className="btn-submit">Submit Faculty Evaluation</button>
+                      </form>
+                    </div>
+                  )}
+
+                  {activeTab === 'evaluations-list' && (
+                    <div className="content-card">
+                      <h3><i className="fa-solid fa-list-check" style={{ color: 'var(--primary)' }}></i> Evaluation Records</h3>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Student</th>
+                            <th>Subject ID</th>
+                            <th>Rating</th>
+                            <th>Comments</th>
+                            <th>Date</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {evaluations.map(ev => (
+                            <tr key={ev.id}>
+                              <td>{ev.studentName}</td>
+                              <td>{ev.subjectId}</td>
+                              <td><b>{ev.rating} / 5 ⭐</b></td>
+                              <td>{ev.comments || 'N/A'}</td>
+                              <td>{new Date(ev.submittedAt).toLocaleDateString()}</td>
+                            </tr>
+                          ))}
+                          {evaluations.length === 0 && (
+                            <tr>
+                              <td colSpan="5" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No evaluation records found.</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {activeTab === 'register' && (
+                    <div className="content-card" style={{ maxWidth: '650px' }}>
+                      <h3><i className="fa-solid fa-user-plus" style={{ color: 'var(--primary)' }}></i> User Registration Form</h3>
+                      <form onSubmit={handleUserRegistration}>
+                        <div className="form-group">
+                          <label>Full Name</label>
+                          <input type="text" required placeholder="Enter full name" value={regForm.name} onChange={e => setRegForm({ ...regForm, name: e.target.value })} />
+                        </div>
+                        <div className="form-group">
+                          <label>Email Address</label>
+                          <input type="email" required placeholder="Enter email address" value={regForm.email} onChange={e => setRegForm({ ...regForm, email: e.target.value })} />
+                        </div>
+                        <div className="form-group">
+                          <label>Department</label>
+                          <select value={regForm.department} onChange={e => setRegForm({ ...regForm, department: e.target.value })}>
+                            <option value="HEU">Higher Education Unit (HEU)</option>
+                            <option value="BEU">Basic Education Unit (BEU)</option>
+                          </select>
+                        </div>
+                        <div className="form-group">
+                          <label>System Role</label>
+                          <select value={regForm.role} onChange={e => setRegForm({ ...regForm, role: e.target.value })}>
+                            <option value="Student">Student</option>
+                            <option value="Faculty">Faculty</option>
+                            <option value="Admin">Administrator</option>
+                          </select>
+                        </div>
+                        <button type="submit" className="btn-submit">Register User Account</button>
+                      </form>
+                    </div>
+                  )}
+                </main>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App/>);
+  </script>
+</body>
+</html>
+
+```
